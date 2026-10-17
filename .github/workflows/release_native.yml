@@ -5,6 +5,10 @@ on:
     tags:
       - 'rel-native-*'
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   buildAndUpload-mostly-static:
     strategy:
@@ -12,6 +16,8 @@ jobs:
         os: [ "ubuntu-22.04", "macOS" ]
         profile: [ "n2c", "all" ]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -69,6 +75,8 @@ jobs:
         os: ["ubuntu-22.04"]
         profile: ["n2c", "all"]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     continue-on-error: true
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -127,6 +135,8 @@ jobs:
       matrix:
         profile: ["all"]
     runs-on: windows-latest
+    permissions:
+      contents: write
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

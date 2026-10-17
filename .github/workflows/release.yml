@@ -11,9 +11,15 @@ concurrency:
   group: maven-central-${{ github.ref }}
   cancel-in-progress: false
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
@@ -31,6 +37,11 @@ jobs:
           echo "tag=${ARTIFACT_VERSION}" > docker/compose/.env
       - name: Build with Gradle
         run: ./gradlew clean build distZip dockerZip
+      - name: Generate SBOM (CycloneDX)
+        # KPI G3-KR1: every release ships an SBOM as a release asset
+        run: |
+          ./gradlew cyclonedxBom -PskipSigning=true
+          cp build/reports/cyclonedx/bom.json applications/build/dist/yaci-store-${{env.VERSION}}.cdx.json
       - name: Decode GPG Key
         run: |
           mkdir -p ~/.gradle/
@@ -64,6 +75,7 @@ jobs:
           files: |
             applications/build/dist/yaci-store-${{env.VERSION}}.zip
             applications/build/dist/yaci-store-docker-${{env.VERSION}}.zip
+            applications/build/dist/yaci-store-${{env.VERSION}}.cdx.json
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

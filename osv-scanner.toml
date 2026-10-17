@@ -1,0 +1,16 @@
+# OSV triage register (KPI G3-KR2-I3)
+#
+# Every high/critical finding that is NOT fixed within 30 days must be listed
+# here with a reason and an expiry date for re-review. Entries are read by
+# osv-scanner (`--config osv-scanner.toml`) and suppress the finding until
+# `ignoreUntil`.
+#
+# reason must say one of:
+#   NOT-APPLICABLE: <why the vulnerable code path is not used>   (false positive)
+#   ACCEPTED: <mitigation>; PLAN: <upstream issue / upgrade plan> (justified > 30 days)
+#
+# Example:
+# [[IgnoredVulns]]
+# id = "GHSA-xxxx-xxxx-xxxx"
+# ignoreUntil = 2027-03-31
+# reason = "NOT-APPLICABLE: thymeleaf is only used by the admin UI, which is not exposed in the default profile"

@@ -7,6 +7,8 @@ plugins {
 
     id 'org.ajoberstar.grgit' version '5.2.0'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+    // SBOM (CycloneDX) for KPI G3-KR1: ./gradlew cyclonedxBom -> build/reports/cyclonedx/
+    id 'org.cyclonedx.bom' version '3.4.1'
 }
 
 subprojects {
@@ -325,5 +327,12 @@ nexusPublishing {
     transitionCheckOptions {
         maxRetries.set(60)
         delayBetween.set(java.time.Duration.ofSeconds(10))
+    }
+}
+
+// SBOM: only runtime dependencies (what actually ships), not test/AOT/annotation-processor classpaths
+allprojects {
+    tasks.matching { it.name == 'cyclonedxDirectBom' }.configureEach {
+        includeConfigs.set(['runtimeClasspath'])
     }
 }

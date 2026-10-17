@@ -3,6 +3,10 @@ name: Build Native Dev Build
 on:
   workflow_dispatch:
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   buildAndUpload-mostly-static:
     strategy:

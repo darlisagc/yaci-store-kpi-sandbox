@@ -1,0 +1,76 @@
+# SBOM + vulnerability scan (KPIs G3-KR1 and G3-KR2-I3)
+# 1. Builds a CycloneDX SBOM of the Java runtime dependencies.
+# 2. Scans the SBOM and the npm lockfiles with OSV-Scanner.
+#    Scorecard alone cannot see Java dependencies (there is no Gradle lockfile),
+#    so this scan is the source of truth for the "no high/critical > 30 days" KR.
+# Accepted / false-positive findings are documented in osv-scanner.toml.
+name: SBOM and OSV scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 5 * * 1'   # weekly, catches newly published advisories
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sbom-osv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Generate SBOM
+        run: ./gradlew cyclonedxBom -PskipSigning=true
+
+      - name: Validate SBOM has components and digests
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          bom = json.load(open('build/reports/cyclonedx/bom.json'))
+          comps = bom.get('components', [])
+          hashed = sum(1 for c in comps if c.get('hashes'))
+          print(f"CycloneDX {bom.get('specVersion')}: {len(comps)} components, {hashed} with digests")
+          if not comps or not hashed:
+              sys.exit("SBOM is empty or has no component digests")
+          PY
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sbom-cyclonedx
+          path: build/reports/cyclonedx/bom.json
+
+      - name: Install OSV-Scanner
+        run: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.6.0
+
+      - name: Scan SBOM and lockfiles
+        run: |
+          set +e
+          ~/go/bin/osv-scanner scan source \
+            --config osv-scanner.toml \
+            -L build/reports/cyclonedx/bom.json \
+            -L docs/package-lock.json \
+            -L components/admin-ui/frontend/package-lock.json \
+            --format markdown > osv-report.md
+          code=$?
+          cat osv-report.md >> "$GITHUB_STEP_SUMMARY"
+          # Report-only for now; set to "exit $code" once the backlog is triaged.
+          echo "osv-scanner exit code: $code"
+
+      - name: Upload OSV report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: osv-report
+          path: osv-report.md

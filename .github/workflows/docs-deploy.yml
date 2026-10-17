@@ -5,10 +5,16 @@ on:
     tags:
       - 'rel-docs*'
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   test-deploy:
     name: Test deployment

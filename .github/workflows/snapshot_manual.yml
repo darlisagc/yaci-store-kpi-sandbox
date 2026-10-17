@@ -3,6 +3,10 @@ name: Manual Snapshot Push to SNAPSHOT repo
 on:
   workflow_dispatch:
 
+# Least privilege by default (OpenSSF Scorecard: Token-Permissions)
+permissions:
+  contents: read
+
 jobs:
   commit-build:
     runs-on: ubuntu-latest
