@@ -96,7 +96,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push yaci-store docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
@@ -109,7 +109,7 @@ jobs:
           tags: bloxbean/yaci-store:${{ env.VERSION }}
 
       - name: Build and push yaci-store-ledger-state docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
@@ -122,7 +122,7 @@ jobs:
           tags: bloxbean/yaci-store-ledger-state:${{ env.VERSION }}
 
       - name: Build and push yaci-store-utxo-indexer docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
@@ -135,7 +135,7 @@ jobs:
           tags: bloxbean/yaci-store-utxo-indexer:${{ env.VERSION }}
 
       - name: Build and push yaci-store-admin docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
@@ -148,7 +148,7 @@ jobs:
           tags: bloxbean/yaci-store-admin:${{ env.VERSION }}
 
       - name: Build and push yaci-store-admin-cli docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
