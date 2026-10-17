@@ -4,8 +4,9 @@
 
 **Please do not report security vulnerabilities through public GitHub issues, discussions or Discord.**
 
-Report them privately using GitHub's **"Report a vulnerability"** button on this
-repository's [Security tab](../../security/advisories/new) (GitHub private vulnerability reporting).
+Report them privately using GitHub private vulnerability reporting:
+**https://github.com/bloxbean/yaci-store/security/advisories/new**
+(the "Report a vulnerability" button on the repository's Security tab).
 
 Please include:
 
