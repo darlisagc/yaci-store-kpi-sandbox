@@ -5,7 +5,7 @@ plugins {
     id 'nu.studer.jooq' version '8.2.3'
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 
-    id 'org.ajoberstar.grgit' version '5.2.0'
+    id 'org.ajoberstar.grgit' version '5.3.3'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
     // SBOM (CycloneDX) for KPI G3-KR1: ./gradlew cyclonedxBom -> build/reports/cyclonedx/
     id 'org.cyclonedx.bom' version '3.4.1'
